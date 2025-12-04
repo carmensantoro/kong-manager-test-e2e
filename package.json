@@ -1,0 +1,17 @@
+{
+  "name": "kong-manager-test-e2e",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "cypress": "^15.7.1",
+    "typescript": "^5.5.3"
+  },
+  "private": true,
+  "dependencies": {
+    "prettier": "^3.7.4"
+  }
+}

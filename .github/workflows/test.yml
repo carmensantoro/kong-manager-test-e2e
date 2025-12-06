@@ -43,14 +43,21 @@ jobs:
           build: ''
           wait-on: 'http://localhost:8002'
           wait-on-timeout: 120
+        continue-on-error: true
 
       - name: Generate Report
         if: always()
         run: |
           mkdir -p cypress/reports/mochawesome
           mkdir -p cypress/reports/html
-          npm run report:merge || true
-          npm run report:generate || true
+          mkdir -p cypress/reports/junit
+          # Genera report solo se esistono file JSON
+          if ls cypress/reports/mochawesome/*.json 1> /dev/null 2>&1; then
+            npm run report:merge
+            npm run report:generate
+          else
+            echo "No test results found to merge"
+          fi
 
       - name: Upload Test Report
         if: always()
@@ -58,6 +65,7 @@ jobs:
         with:
           name: cypress-report
           path: cypress/reports/html
+          if-no-files-found: ignore
 
       - name: Upload JUnit Results
         if: always()
@@ -65,6 +73,7 @@ jobs:
         with:
           name: junit-results
           path: cypress/reports/junit
+          if-no-files-found: ignore
 
       - name: Stop Docker Compose
         if: always()

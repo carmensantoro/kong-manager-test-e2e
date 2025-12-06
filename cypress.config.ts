@@ -14,7 +14,7 @@ export default defineConfig({
     },
     reporter: "cypress-multi-reporters",
     reporterOptions: {
-      configFile: "cypress-report-config.json",
+      configFile: "cypress_report_config.json",
     },
   },
 });

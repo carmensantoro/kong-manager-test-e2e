@@ -1,19 +1,29 @@
 name: Gateway Test Pipeline
 
-on: [push]
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        containers: [1,2]
     steps:
       - name: Checkout
         uses: actions/checkout@v4.3.1
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker Image
+        run: docker compose -f docker-compose.yml up -d
+
       - name: Run Cypress Test
         uses: cypress-io/github-action@v5
-    env:
-      SPLIT: ${{ strategy.job-total }}
-      SPLIT_INDEX: ${{ strategy.job-index }}
+
+      - name: Stop Docker Compose
+        run: docker compose -f docker-compose.yml down

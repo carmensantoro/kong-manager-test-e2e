@@ -1,6 +1,7 @@
 import { GatewayServices } from "../fixtures/gateway-services";
 import { General } from "../fixtures/general";
 import { ADMIN_API } from "../support/commands";
+import { CypressSingleResponse } from "../support/types";
 
 describe("Create a new Service", (): void => {
   it("Navigate back to Overview page when you click the Cancel button", (): void => {
@@ -135,10 +136,14 @@ describe("View of the Service Details Page", (): void => {
   it("Delete a Service", (): void => {
     // TODO: Create a method in the commands.ts file, where you can create a new service, so you can have isolate tests (set up and tear down logic)
     const serviceName: string = "Service" + Math.random();
-    cy.request("POST", `${ADMIN_API()}/services`, {
-      name: serviceName,
-      url: "http://httpbin.konghq.com",
-    }).then((response) => {
+    cy.request<CypressSingleResponse<{ id: string; name: string }>>(
+      "POST",
+      `${ADMIN_API()}/services`,
+      {
+        name: serviceName,
+        url: "http://httpbin.konghq.com",
+      },
+    ).then((response) => {
       expect(response.status).to.eq(201);
 
       const serviceId: string = response.body.id;

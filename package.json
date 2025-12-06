@@ -6,6 +6,7 @@
   "scripts": {
     "build": "tsc",
     "cy:run": "cypress run",
+    "cy:open": "cypress open",
     "report:merge": "mochawesome-merge cypress/reports/mochawesome/*.json > cypress/reports/mochawesome/merged.json",
     "report:generate": "marge cypress/reports/mochawesome/merged.json -f index -o cypress/reports/html",
     "report:clean": "rm -rf cypress/reports",

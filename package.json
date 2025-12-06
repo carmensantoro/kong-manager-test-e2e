@@ -4,7 +4,8 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "cy:open": "cypress open"
   },
   "devDependencies": {
     "cypress": "^15.7.1",

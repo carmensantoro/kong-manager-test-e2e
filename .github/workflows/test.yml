@@ -13,8 +13,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4.3.1
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
       - name: Install Dependencies
         run: npm install
+
+      - name: Run Build
+        run: npm run build
 
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -22,8 +31,39 @@ jobs:
       - name: Build Docker Image
         run: docker compose -f docker-compose.yml up -d
 
-      - name: Run Cypress Test
+      - name: Wait for services
+        run: |
+          npm install -g wait-on
+          wait-on http://localhost:8002 --timeout 120000
+
+      - name: Run Cypress Tests
         uses: cypress-io/github-action@v5
+        with:
+          install: false
+          build: false
+          wait-on: 'http://localhost:8002'
+          wait-on-timeout: 120
+
+      - name: Generate Report
+        if: always()
+        run: |
+          npm run report:merge
+          npm run report:generate
+
+      - name: Upload Test Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-report
+          path: cypress/reports/html
+
+      - name: Upload JUnit Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: junit-results
+          path: cypress/reports/junit
 
       - name: Stop Docker Compose
+        if: always()
         run: docker compose -f docker-compose.yml down

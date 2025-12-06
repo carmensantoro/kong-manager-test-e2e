@@ -6,6 +6,8 @@ export const GatewayServices = {
   NEW_GATEWAY_SERVICE_BTN1: "[data-testid='empty-state-action']",
   // Button visible only when there are Gateway Services
   NEW_GATEWAY_SERVICE_BTN2: "[data-testid='toolbar-add-gateway-service']",
+  SERVICE_OPTIONS_BTN: "[data-testid='row-actions-dropdown-trigger']",
+  SERVICE_DELETE_BTN: "[data-testid='action-entity-delete']",
 
   // New Gateway Service Form
   BASIC_ROUTE_CONFIGURATION_RADIO_BTN:

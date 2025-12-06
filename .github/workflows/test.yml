@@ -1,17 +1,19 @@
-name: Test Kong Manager
-on:
-  pull_request:
-    branches:
-      - main
+name: Gateway Test Pipeline
+
+on: [push]
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        containers: [1,2]
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-      - run: npm ci
-      - run: npm test
-      - run: npm run build
+      - name: Checkout
+        uses: actions/checkout@v4.3.1
+      - name: Run Cypress Test
+        uses: cypress-io/github-action@v5
+    env:
+      SPLIT: ${{ strategy.job-total }}
+      SPLIT_INDEX: ${{ strategy.job-index }}

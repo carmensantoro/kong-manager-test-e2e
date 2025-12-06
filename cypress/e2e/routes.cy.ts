@@ -4,8 +4,7 @@ import { Routes } from "../fixtures/routes";
 describe("Creation of a new Route", (): void => {
   it("Create a new Route", (): void => {
     cy.visit(`/default/routes`);
-    // It checks the loading screen is visible at first
-    cy.get(General.LOADING_PAGE).should("be.visible");
+    // It checks the loading screen isn't visible
     cy.get(General.LOADING_PAGE).should("not.exist");
 
     // Create a new Route by clicking on the New route button

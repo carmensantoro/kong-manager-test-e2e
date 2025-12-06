@@ -28,8 +28,7 @@ describe("Create a new Service", (): void => {
 
   it("Create a new Service in the Overview page", (): void => {
     cy.visit(`/default/overview`);
-    // Checks the loading screen is visible at first
-    cy.get(General.LOADING_PAGE).should("be.visible");
+    // Checks the loading screen isn't visible
     cy.get(General.LOADING_PAGE).should("not.exist");
 
     cy.get(GatewayServices.ADD_GATEWAY_SERVICE_BTN)

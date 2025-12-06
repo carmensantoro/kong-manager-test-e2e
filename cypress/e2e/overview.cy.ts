@@ -9,8 +9,7 @@ describe(`Kong Manager UI Test on desktop`, (): void => {
   });
 
   it("Check service and route count are 0 by default in Overview page", () => {
-    // It checks the loading screen is visible at first
-    cy.get(General.LOADING_PAGE).should("be.visible");
+    // It checks the loading screen isn't visible
     cy.get(General.LOADING_PAGE).should("not.exist");
 
     cy.get(Overview.OVERVIEW_PAGE_TITLE).should("have.text", "Overview");

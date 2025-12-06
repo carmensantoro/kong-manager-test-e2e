@@ -1,5 +1,6 @@
 /// <reference types="cypress" />
 import { CypressResponse, CypressSingleResponse, SummaryTypes } from "./types";
+import { getAdminApiUrl } from "./utils";
 
 declare global {
   namespace Cypress {
@@ -13,9 +14,6 @@ declare global {
   }
 }
 
-export const ADMIN_API = (): string =>
-  Cypress.env("ADMIN_API_URL") || "http://localhost:8001";
-
 /**
  * Clean-up summary data via kong admin api
  * @param type can be the single type (service, route, consumers, plugins) or all the types you want to clean up
@@ -26,11 +24,11 @@ Cypress.Commands.add("cleanUpSummary", (type: SummaryTypes): void => {
   if (type === SummaryTypes.ROUTE || type === SummaryTypes.ALL) {
     cy.request<CypressResponse<{ id: string }>>(
       "GET",
-      `${ADMIN_API()}/routes`,
+      `${getAdminApiUrl()}/routes`,
     ).then((response) => {
       if (response.body?.data) {
         response.body.data.forEach(({ id }) => {
-          cy.request("DELETE", `${ADMIN_API()}/routes/${id}`);
+          cy.request("DELETE", `${getAdminApiUrl()}/routes/${id}`);
         });
       }
     });
@@ -39,17 +37,23 @@ Cypress.Commands.add("cleanUpSummary", (type: SummaryTypes): void => {
   if (type === SummaryTypes.SERVICE || type === SummaryTypes.ALL) {
     cy.request<CypressResponse<{ name: string }>>(
       "GET",
-      `${ADMIN_API()}/services`,
+      `${getAdminApiUrl()}/services`,
     ).then((response) => {
       if (response.body?.data) {
         response.body.data.forEach(({ name }) => {
-          cy.request("DELETE", `${ADMIN_API()}/services/${name}`);
+          cy.request("DELETE", `${getAdminApiUrl()}/services/${name}`);
         });
       }
     });
   }
 });
 
+/**
+ * Create a service via kong admin api
+ * @param serviceName the name of the service to create
+ * @param url the url of the service to create
+ * @returns a promise with the service response body
+ */
 Cypress.Commands.add(
   "createService",
   (
@@ -59,7 +63,7 @@ Cypress.Commands.add(
     return cy
       .request<CypressSingleResponse<{ id: string; name: string }>>(
         "POST",
-        `${ADMIN_API()}/services`,
+        `${getAdminApiUrl()}/services`,
         {
           name: serviceName,
           url: url,

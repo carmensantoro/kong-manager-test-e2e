@@ -1,7 +1,5 @@
 import { GatewayServices } from "../fixtures/gateway-services";
 import { General } from "../fixtures/general";
-import { ADMIN_API } from "../support/commands";
-import { CypressSingleResponse } from "../support/types";
 
 describe("Create a new Service", (): void => {
   it("Navigate back to Overview page when you click the Cancel button", (): void => {

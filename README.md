@@ -147,6 +147,86 @@ Kong credentials:
 - **Mocha JUnit Reporter** - XML report generator for CI/CD
 - **Docker Compose** - Local environment setup
 
+## Design Considerations, Assumptions, and Trade-offs
+
+### Design Considerations
+
+**1. Test Architecture**
+- **Page Object Pattern Alternative**: Used fixture files to centralize selectors and test data instead of traditional Page Object Model. This approach provides a simpler structure suitable for the project's scope while maintaining maintainability.
+- **Custom Commands**: Implemented reusable Cypress commands (`cleanUpSummary`, `createService`) to handle repetitive operations like API-based data setup and cleanup, reducing code duplication across test specs.
+- **API-First Approach**: Leveraged Kong's Admin API for test data preparation and cleanup rather than performing all operations through the UI, significantly improving test execution speed and reliability.
+
+**2. Test Data Management**
+- **Isolation Strategy**: Each test suite cleans up its own data before execution using `beforeEach` hooks, ensuring test independence and preventing cascading failures.
+- **Predictable Data**: Used deterministic service/route names (e.g., "service-test-01") to make tests reproducible and easier to debug.
+
+**3. Reporting Strategy**
+- **Dual Reporting**: Implemented both Mochawesome (HTML) and JUnit (XML) reporters to serve different needs:
+  - Mochawesome for detailed, human-readable test reports with screenshots
+  - JUnit for CI/CD integration and trend analysis
+- **Consolidated Reports**: Merge multiple JSON reports into a single HTML output for easier review.
+
+**4. Error Handling**
+- **Graceful Failure Handling**: Configured Cypress to handle known Kong Manager uncaught exceptions to prevent false negatives while still catching legitimate test failures.
+
+### Assumptions
+
+**1. Environment**
+- Kong Gateway and Kong Manager are available and properly configured via Docker Compose
+- Services run on standard ports (8001 for Admin API, 8002 for Kong Manager)
+- PostgreSQL database is used as Kong's data store
+- Tests run on a local development environment with Docker installed
+
+**2. Application Behavior**
+- Kong Manager UI follows consistent selector patterns across versions
+- The Admin API endpoints remain stable and backward-compatible
+- Authentication is pre-configured with known credentials (`handyshake`)
+- Network latency is minimal (localhost execution)
+
+**3. Test Scope**
+- Tests focus on core user workflows (services, routes, overview) rather than exhaustive feature coverage
+- Assumes basic Kong Gateway functionality is tested elsewhere (unit/integration tests)
+- UI validation is prioritized over performance testing
+
+**4. Data State**
+- Database starts in a clean state or can be cleaned via Admin API
+- No external dependencies on other services or microservices
+- Test data created during tests doesn't conflict with production data
+
+### Trade-offs
+
+**1. Fixture Files vs. Page Object Model**
+- **Chosen**: Fixture files for selectors
+- **Trade-off**: Less abstraction but simpler maintenance for a small test suite. As the project grows, this may need refactoring to full POM for better scalability.
+
+**2. API Setup vs. UI Setup**
+- **Chosen**: Admin API for test data creation/cleanup
+- **Trade-off**: Faster test execution and better reliability, but doesn't test the UI creation flows as thoroughly. Critical user paths still validate UI-based creation.
+
+**3. TypeScript vs. JavaScript**
+- **Chosen**: TypeScript
+- **Trade-off**: Additional compilation step and type definition overhead, but provides better IDE support, compile-time error detection, and self-documenting code.
+
+**4. Headless vs. Interactive by Default**
+- **Chosen**: Headless execution in CI via `npm test`
+- **Trade-off**: Faster execution and suitable for CI/CD, but requires developers to explicitly use `cypress open` for debugging.
+
+**5. Docker Compose for Environment**
+- **Chosen**: Local Docker setup instead of connecting to remote environments
+- **Trade-off**: Requires Docker installation and local resources, but provides consistent, reproducible test environments and eliminates external dependencies.
+
+**6. Single Viewport Size**
+- **Chosen**: Fixed 1280x720 viewport
+- **Trade-off**: Doesn't test responsive behavior, but ensures consistent test execution and reduces flakiness from variable screen sizes, like mobile or tablet.
+
+**7. Multiple Reporters**
+- **Chosen**: Both Mochawesome and JUnit reporters enabled simultaneously
+- **Trade-off**: Slightly increased test execution time and disk space usage, but provides flexibility for different reporting needs (local development vs. CI/CD).
+
+**8. Test Granularity**
+- **Chosen**: Focused E2E tests covering critical paths rather than exhaustive scenarios
+- **Trade-off**: Faster test suite execution but potentially missing edge cases. This is balanced by assuming unit/integration tests cover detailed scenarios.
+
 ## Technical Notes
 
 - Tests are written in TypeScript

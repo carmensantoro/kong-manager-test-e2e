@@ -1,13 +1,20 @@
 import { GatewayServices } from "../fixtures/gateway-services";
 import { General } from "../fixtures/general";
+import { SummaryTypes } from "../support/types";
 
-describe("Create a new Service", (): void => {
+describe("Gateway services e2e tests", (): void => {
+  beforeEach(() => {
+    cy.cleanUpSummary(SummaryTypes.ALL);
+  });
+
   it("Navigate back to Overview page when you click the Cancel button", (): void => {
     cy.visit(`/default/overview`);
     cy.get(GatewayServices.ADD_GATEWAY_SERVICE_BTN)
       .contains("Add a Gateway Service")
       .click();
     cy.get(GatewayServices.CANCEL_BTN).click();
+
+    // Check that we are back on the Overview page
     cy.url().should("include", "/overview");
     cy.get(GatewayServices.GATEWAY_SERVICES_PAGE_TITLE).contains("Overview");
   });
@@ -18,6 +25,8 @@ describe("Create a new Service", (): void => {
       .contains("New gateway service")
       .click();
     cy.get(GatewayServices.CANCEL_BTN).click();
+
+    // Check that we are back on the Gateway Services page
     cy.url().should("include", "/services");
     cy.get(GatewayServices.GATEWAY_SERVICES_PAGE_TITLE).contains(
       "Gateway Services",
@@ -28,18 +37,19 @@ describe("Create a new Service", (): void => {
     cy.visit(`/default/overview`);
     // Checks the loading screen isn't visible
     cy.get(General.LOADING_PAGE).should("not.exist");
-
     cy.get(GatewayServices.ADD_GATEWAY_SERVICE_BTN)
       .contains("Add a Gateway Service")
       .click();
 
-    // Create the service with the basic configuration
+    // Check the save button is disabled
     cy.get(GatewayServices.SUBMIT_BTN).should("be.disabled");
+
+    // Create the service with the basic configuration
     cy.get(GatewayServices.BASIC_ROUTE_CONFIGURATION_RADIO_BTN).should(
       "have.checked",
     );
 
-    // Fill the form with the url e and the name
+    // Fill the form with the url and the name
     cy.get(GatewayServices.SERVICE_URL).should("have.attr", "required");
     cy.get(GatewayServices.SERVICE_URL)
       .type("http://httpbin.konghq.com")
@@ -104,10 +114,13 @@ describe("Create a new Service", (): void => {
   });
 
   it("Create a new Service with an invalid full url", (): void => {
+    cy.createService("http://httpbin.konghq.com");
+
     cy.visit(`default/services`);
     cy.get(GatewayServices.NEW_GATEWAY_SERVICE_BTN2)
       .contains("New gateway service")
       .click();
+
     // Fill the form with the url e and the name
     cy.get(GatewayServices.SERVICE_URL).type("TEST");
     cy.get(GatewayServices.SERVICE_URL)
@@ -118,37 +131,43 @@ describe("Create a new Service", (): void => {
       );
     cy.get(GatewayServices.SUBMIT_BTN).should("be.disabled");
   });
-});
 
-describe("View of the Gateway Services Page", (): void => {
-  // TODO: Delete a service in the Gateway Services page
-  it("Delete a Service", (): void => {
-    cy.visit(`default/services`);
+  it("Delete a Service in the Gateway Services Page", (): void => {
+    // Create a new Service
+    cy.createService("http://httpbin.konghq.com").then((response) => {
+      cy.visit(`default/services`);
 
-    // Delete the service
+      // Delete the service from the table
+      cy.get(GatewayServices.SERVICE_OPTIONS_BTN).click();
+      cy.get(GatewayServices.SERVICE_DELETE_BTN).click();
+      cy.get(GatewayServices.DELETE_MODAL_INPUT).type(response.name);
+      cy.get(GatewayServices.DELETE_MODAL_BTN).contains("Yes, delete").click();
+
+      // Success message is visible
+      cy.get(General.SUCCESS_TOASTBAR)
+        .contains(`Gateway Service "${response.name}" successfully deleted!`)
+        .should("be.visible");
+    });
   });
-});
 
-describe("View of the Service Details Page", (): void => {
-  it("Delete a Service", (): void => {
-    const serviceName: string = "Service" + Math.random();
-    cy.createService(serviceName, "http://httpbin.konghq.com").then(
-      (service) => {
-        cy.visit(`default/services/${service.id}`);
-      },
-    );
+  it("Delete a Service in the Service Details Page", (): void => {
+    // Create a new Service
+    cy.createService("http://httpbin.konghq.com").then((response) => {
+      cy.visit(`default/services/${response.id}`);
 
-    // Delete the service
-    cy.get(GatewayServices.GATEWAY_SERVICE_ACTIONS_BTN).click();
-    cy.get(GatewayServices.DELETE_BTN).find("span").contains("Delete").click();
-    cy.get(GatewayServices.DELETE_MODAL_INPUT).type(serviceName);
-    cy.get(GatewayServices.DELETE_MODAL_BTN).contains("Yes, delete").click();
+      // Delete the service
+      cy.get(GatewayServices.GATEWAY_SERVICE_ACTIONS_BTN).click();
+      cy.get(GatewayServices.DELETE_BTN)
+        .find("span")
+        .contains("Delete")
+        .click();
+      cy.get(GatewayServices.DELETE_MODAL_INPUT).type(response.name);
+      cy.get(GatewayServices.DELETE_MODAL_BTN).contains("Yes, delete").click();
 
-    // Success message is visible
-    cy.get(General.SUCCESS_TOASTBAR)
-      .contains(`Gateway Service "${serviceName}" successfully deleted!`)
-      .should("be.visible");
-
-    // TODO: check that the service is not in the Gateway Services page
+      // Success message is visible
+      cy.get(General.SUCCESS_TOASTBAR)
+        .contains(`Gateway Service "${response.name}" successfully deleted!`)
+        .should("be.visible");
+    });
   });
 });

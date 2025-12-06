@@ -1,13 +1,15 @@
 import { General } from "../fixtures/general";
 import { Routes } from "../fixtures/routes";
+import { SummaryTypes } from "../support/types";
 
 describe("Creation of a new Route", (): void => {
+  beforeEach(() => {
+    cy.cleanUpSummary(SummaryTypes.ALL);
+  });
+
   it("Create a new Route", (): void => {
     // Create a new Service
-    const serviceName: string = "Service" + Math.random();
-    cy.createService(serviceName, "http://httpbin.konghq.com")
-      .its("id")
-      .as("serviceId");
+    cy.createService("http://httpbin.konghq.com").its("id").as("serviceId");
 
     cy.visit(`/default/routes`);
     // It checks the loading screen isn't visible

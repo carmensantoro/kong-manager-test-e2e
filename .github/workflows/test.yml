@@ -40,15 +40,17 @@ jobs:
         uses: cypress-io/github-action@v5
         with:
           install: false
-          build: false
+          build: ''
           wait-on: 'http://localhost:8002'
           wait-on-timeout: 120
 
       - name: Generate Report
         if: always()
         run: |
-          npm run report:merge
-          npm run report:generate
+          mkdir -p cypress/reports/mochawesome
+          mkdir -p cypress/reports/html
+          npm run report:merge || true
+          npm run report:generate || true
 
       - name: Upload Test Report
         if: always()

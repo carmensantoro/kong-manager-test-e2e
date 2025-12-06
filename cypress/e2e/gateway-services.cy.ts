@@ -133,22 +133,12 @@ describe("View of the Gateway Services Page", (): void => {
 
 describe("View of the Service Details Page", (): void => {
   it("Delete a Service", (): void => {
-    // TODO: Create a method in the commands.ts file, where you can create a new service, so you can have isolate tests (set up and tear down logic)
     const serviceName: string = "Service" + Math.random();
-    cy.request<CypressSingleResponse<{ id: string; name: string }>>(
-      "POST",
-      `${ADMIN_API()}/services`,
-      {
-        name: serviceName,
-        url: "http://httpbin.konghq.com",
+    cy.createService(serviceName, "http://httpbin.konghq.com").then(
+      (service) => {
+        cy.visit(`default/services/${service.id}`);
       },
-    ).then((response) => {
-      expect(response.status).to.eq(201);
-
-      const serviceId: string = response.body.id;
-      // Take the service id from the Gateway Services page
-      cy.visit(`default/services/${serviceId}`);
-    });
+    );
 
     // Delete the service
     cy.get(GatewayServices.GATEWAY_SERVICE_ACTIONS_BTN).click();

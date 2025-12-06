@@ -1,10 +1,14 @@
 /// <reference types="cypress" />
-import { CypressResponse, SummaryTypes } from "./types";
+import { CypressResponse, CypressSingleResponse, SummaryTypes } from "./types";
 
 declare global {
   namespace Cypress {
     interface Chainable {
       cleanUpSummary(type: SummaryTypes): void;
+      createService(
+        serviceName: string,
+        url: string,
+      ): Chainable<{ id: string; name: string }>;
     }
   }
 }
@@ -45,6 +49,28 @@ Cypress.Commands.add("cleanUpSummary", (type: SummaryTypes): void => {
     });
   }
 });
+
+Cypress.Commands.add(
+  "createService",
+  (
+    serviceName: string,
+    url: string,
+  ): Cypress.Chainable<{ id: string; name: string }> => {
+    return cy
+      .request<CypressSingleResponse<{ id: string; name: string }>>(
+        "POST",
+        `${ADMIN_API()}/services`,
+        {
+          name: serviceName,
+          url: url,
+        },
+      )
+      .then((response) => {
+        expect(response.status).to.eq(201);
+        return response.body;
+      });
+  },
+);
 
 /**
  * Manage uncaught exceptions that occur during test execution

@@ -3,6 +3,12 @@ import { Routes } from "../fixtures/routes";
 
 describe("Creation of a new Route", (): void => {
   it("Create a new Route", (): void => {
+    // Create a new Service
+    const serviceName: string = "Service" + Math.random();
+    cy.createService(serviceName, "http://httpbin.konghq.com")
+      .its("id")
+      .as("serviceId");
+
     cy.visit(`/default/routes`);
     // It checks the loading screen isn't visible
     cy.get(General.LOADING_PAGE).should("not.exist");
@@ -17,7 +23,12 @@ describe("Creation of a new Route", (): void => {
       .type("New-Route")
       .should("have.value", "New-Route");
     cy.get(Routes.SERVICE_LIST).click();
-    cy.get(Routes.SERVICE_LIST_ITEM).click();
+    cy.get("@serviceId").then((serviceId) => {
+      cy.get(Routes.SERVICE_LIST_ITEM)
+        .parents("button")
+        .should("have.value", serviceId)
+        .click();
+    });
     cy.get(Routes.TAGS_INPUT)
       .type("tag1,tag2")
       .should("have.value", "tag1,tag2");

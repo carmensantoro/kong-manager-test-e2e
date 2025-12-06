@@ -1,7 +1,7 @@
 {
   "name": "kong-manager-test-e2e",
   "version": "1.0.0",
-  "description": "",
+  "description": "End-to-end test suite for Kong Manager using Cypress",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",

@@ -1,3 +1,5 @@
+export type CypressResponse<T extends object> = { data: T[] };
+
 export const SummaryTypes = {
   SERVICE: "service",
   ROUTE: "route",

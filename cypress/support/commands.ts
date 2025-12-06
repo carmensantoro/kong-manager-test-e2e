@@ -7,8 +7,8 @@ declare global {
     interface Chainable {
       cleanUpSummary(type: SummaryTypes): void;
       createService(
-        serviceName: string,
         url: string,
+        serviceName?: string,
       ): Chainable<{ id: string; name: string }>;
     }
   }
@@ -50,22 +50,26 @@ Cypress.Commands.add("cleanUpSummary", (type: SummaryTypes): void => {
 
 /**
  * Create a service via kong admin api
- * @param serviceName the name of the service to create
  * @param url the url of the service to create
+ * @param serviceName optional, it's the name of the service to create,
+ * if not provided a random name will be generated
  * @returns a promise with the service response body
  */
 Cypress.Commands.add(
   "createService",
   (
-    serviceName: string,
     url: string,
+    serviceName?: string,
   ): Cypress.Chainable<{ id: string; name: string }> => {
+    let customServiceName = !serviceName
+      ? "Service" + Math.random()
+      : serviceName;
     return cy
       .request<CypressSingleResponse<{ id: string; name: string }>>(
         "POST",
         `${getAdminApiUrl()}/services`,
         {
-          name: serviceName,
+          name: customServiceName,
           url: url,
         },
       )

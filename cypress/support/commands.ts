@@ -1,5 +1,5 @@
 /// <reference types="cypress" />
-import { SummaryTypes } from "./types";
+import { CypressResponse, SummaryTypes } from "./types";
 
 declare global {
   namespace Cypress {
@@ -9,7 +9,8 @@ declare global {
   }
 }
 
-const ADMIN_API = () => Cypress.env("ADMIN_API_URL") || "http://localhost:8001";
+export const ADMIN_API = (): string =>
+  Cypress.env("ADMIN_API_URL") || "http://localhost:8001";
 
 /**
  * Clean-up summary data via kong admin api
@@ -18,23 +19,45 @@ const ADMIN_API = () => Cypress.env("ADMIN_API_URL") || "http://localhost:8001";
  */
 Cypress.Commands.add("cleanUpSummary", (type: SummaryTypes): void => {
   // TODO: add consumers and plugins to clean up everything
-  if (type === SummaryTypes.SERVICE || type === SummaryTypes.ALL) {
-    cy.request("GET", `${ADMIN_API()}/services`).then((response) => {
-      if (response.body?.data && Array.isArray(response.body.data)) {
-        response.body.data.forEach((service: { name: any }) => {
-          cy.request("DELETE", `${ADMIN_API()}/services/${service.name}`);
+  if (type === SummaryTypes.ROUTE || type === SummaryTypes.ALL) {
+    cy.request<CypressResponse<{ id: string }>>(
+      "GET",
+      `${ADMIN_API()}/routes`,
+    ).then((response) => {
+      if (response.body?.data) {
+        response.body.data.forEach(({ id }) => {
+          cy.request("DELETE", `${ADMIN_API()}/routes/${id}`);
         });
       }
     });
   }
 
-  if (type === SummaryTypes.ROUTE || type === SummaryTypes.ALL) {
-    cy.request("GET", `${ADMIN_API()}/routes`).then((response) => {
-      if (response.body?.data && Array.isArray(response.body.data)) {
-        response.body.data.forEach((route: { id: any }) => {
-          cy.request("DELETE", `${ADMIN_API()}/routes/${route.id}`);
+  if (type === SummaryTypes.SERVICE || type === SummaryTypes.ALL) {
+    cy.request<CypressResponse<{ name: string }>>(
+      "GET",
+      `${ADMIN_API()}/services`,
+    ).then((response) => {
+      if (response.body?.data) {
+        response.body.data.forEach(({ name }) => {
+          cy.request("DELETE", `${ADMIN_API()}/services/${name}`);
         });
       }
     });
   }
+});
+
+/**
+ * Manage uncaught exceptions that occur during test execution
+ * The handler receives the error object and returns a boolean:
+ * - False - Tells Cypress to ignore the error and continue the test
+ * - True - Tells Cypress to fail the test
+ * @return boolean
+ */
+Cypress.on("uncaught:exception", (err: Error): boolean => {
+  // Ignore specific known errors from Kong Manager
+  if (err.message.includes("Script error")) {
+    return false;
+  }
+  // Let other errors fail the test
+  return true;
 });

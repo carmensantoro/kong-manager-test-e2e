@@ -1,6 +1,6 @@
 import { SummaryTypes } from "../support/types";
-import { Overview } from "../fixtures/1-overview";
-import { General } from "../fixtures/0-general";
+import { Overview } from "../fixtures/overview";
+import { General } from "../fixtures/general";
 
 describe(`Kong Manager UI Test on desktop`, (): void => {
   beforeEach(() => {

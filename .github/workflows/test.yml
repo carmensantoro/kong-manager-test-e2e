@@ -51,7 +51,6 @@ jobs:
           mkdir -p cypress/reports/mochawesome
           mkdir -p cypress/reports/html
           mkdir -p cypress/reports/junit
-          # Genera report solo se esistono file JSON
           if ls cypress/reports/mochawesome/*.json 1> /dev/null 2>&1; then
             npm run report:merge
             npm run report:generate

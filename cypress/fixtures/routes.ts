@@ -13,4 +13,7 @@ export const Routes = {
   METHODS_INPUT: "[data-testid='route-form-methods']",
   METHODS_INPUT_GET: "[data-testid='multiselect-item-GET']",
   ROUTE_ID: "[data-testid='id-property-value']",
+
+  SUCCESS_TEXT_CREATE_MESSAGE:
+    'Route "{SUCCESS_TEXT_CREATE_MESSAGE}" successfully created!',
 };

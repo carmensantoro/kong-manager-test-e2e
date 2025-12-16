@@ -108,9 +108,11 @@ describe("Gateway services e2e tests", (): void => {
 
     // Submit the form and the success message is visible
     cy.get(GatewayServices.SUBMIT_BTN).click();
-    cy.get(General.SUCCESS_TOASTBAR)
-      .contains('Gateway Service "New-Service" successfully created!')
-      .should("be.visible");
+    let message = GatewayServices.SUCCESS_TEXT_CREATE_MESSAGE.replace(
+      "{SUCCESS_TEXT_CREATE_MESSAGE}",
+      "New-Service",
+    );
+    cy.toastbarMessage(message, true);
   });
 
   it("Create a new Service with an invalid full url", (): void => {
@@ -144,9 +146,11 @@ describe("Gateway services e2e tests", (): void => {
       cy.get(GatewayServices.DELETE_MODAL_BTN).contains("Yes, delete").click();
 
       // Success message is visible
-      cy.get(General.SUCCESS_TOASTBAR)
-        .contains(`Gateway Service "${response.name}" successfully deleted!`)
-        .should("be.visible");
+      let message = GatewayServices.SUCCESS_TEXT_DELETE_MESSAGE.replace(
+        "{SUCCESS_TEXT_DELETE_MESSAGE}",
+        response.name,
+      );
+      cy.toastbarMessage(message, true);
     });
   });
 
@@ -165,9 +169,11 @@ describe("Gateway services e2e tests", (): void => {
       cy.get(GatewayServices.DELETE_MODAL_BTN).contains("Yes, delete").click();
 
       // Success message is visible
-      cy.get(General.SUCCESS_TOASTBAR)
-        .contains(`Gateway Service "${response.name}" successfully deleted!`)
-        .should("be.visible");
+      let message = GatewayServices.SUCCESS_TEXT_DELETE_MESSAGE.replace(
+        "{SUCCESS_TEXT_DELETE_MESSAGE}",
+        response.name,
+      );
+      cy.toastbarMessage(message, true);
     });
   });
 });

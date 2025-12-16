@@ -1,6 +1,7 @@
 /// <reference types="cypress" />
 import { CypressResponse, CypressSingleResponse, SummaryTypes } from "./types";
 import { getAdminApiUrl } from "./utils";
+import { General } from "../fixtures/general";
 
 declare global {
   namespace Cypress {
@@ -10,6 +11,7 @@ declare global {
         url: string,
         serviceName?: string,
       ): Chainable<{ id: string; name: string }>;
+      toastbarMessage(message: string, isVisible: boolean): void;
     }
   }
 }
@@ -77,6 +79,16 @@ Cypress.Commands.add(
         expect(response.status).to.eq(201);
         return response.body;
       });
+  },
+);
+
+Cypress.Commands.add(
+  "toastbarMessage",
+  (message: string, isVisible: boolean): void => {
+    // TODO: You can add a condition to cover all the different toastbar messages
+    let isVisibleValue = isVisible ? "be.visible" : "be.not.visible";
+    // Success message is visible when you delete or create a service/route
+    cy.get(General.SUCCESS_TOASTBAR).contains(message).should(isVisibleValue);
   },
 );
 

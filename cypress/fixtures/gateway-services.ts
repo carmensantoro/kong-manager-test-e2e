@@ -42,4 +42,10 @@ export const GatewayServices = {
   CONFIRMATION_TEXT: "span[class='confirmation-text']",
   DELETE_MODAL_INPUT: "[data-testid='confirmation-input']",
   DELETE_MODAL_BTN: "[data-testid='modal-action-button']",
+
+  // Messages
+  SUCCESS_TEXT_DELETE_MESSAGE:
+    'Gateway Service "{SUCCESS_TEXT_DELETE_MESSAGE}" successfully deleted!',
+  SUCCESS_TEXT_CREATE_MESSAGE:
+    'Gateway Service "{SUCCESS_TEXT_CREATE_MESSAGE}" successfully created!',
 };

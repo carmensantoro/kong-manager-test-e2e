@@ -48,8 +48,10 @@ describe("Creation of a new Route", (): void => {
 
     // Submit the form and the success message is visible
     cy.get(Routes.SUBMIT_BTN).click();
-    cy.get(General.SUCCESS_TOASTBAR)
-      .contains('Route "New-Route" successfully created!')
-      .should("be.visible");
+    let message = Routes.SUCCESS_TEXT_CREATE_MESSAGE.replace(
+      "{SUCCESS_TEXT_CREATE_MESSAGE}",
+      "New-Route",
+    );
+    cy.toastbarMessage(message, true);
   });
 });

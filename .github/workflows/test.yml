@@ -31,16 +31,11 @@ jobs:
       - name: Build Docker Image
         run: docker compose -f docker-compose.yml up -d
 
-      - name: Wait for services
-        run: |
-          npm install -g wait-on
-          wait-on http://localhost:8002 --timeout 120000
-
       - name: Run Cypress Tests
         uses: cypress-io/github-action@v5
         with:
           install: false
-          build: ''
+          build: 'npm install -g wait-on'
           wait-on: 'http://localhost:8002'
           wait-on-timeout: 120
         continue-on-error: true
